@@ -123,14 +123,22 @@ install_renode() {
     local url="https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/${tarball}"
     local tmp
     tmp="$(mktemp -d)"
-    trap 'rm -rf "$tmp"' RETURN
 
     echo "    Downloading $tarball ..."
-    curl -fL --progress-bar -o "$tmp/$tarball" "$url" \
-      || die "Failed to download Renode from $url"
+    if ! curl -fL --progress-bar -o "$tmp/$tarball" "$url"; then
+      rm -rf "$tmp"
+      die "Failed to download Renode from $url"
+    fi
 
     mkdir -p "$RENODE_DIR"
-    tar -xzf "$tmp/$tarball" -C "$RENODE_DIR" --strip-components=1
+    if ! tar -xzf "$tmp/$tarball" -C "$RENODE_DIR" --strip-components=1; then
+      rm -rf "$tmp" "$RENODE_DIR"
+      die "Failed to extract $tarball"
+    fi
+    # Cleaned up explicitly rather than via a RETURN trap: the trap fires after
+    # bash has torn down the function's locals, so $tmp is unbound by then and
+    # `set -u` aborts the cleanup, leaking the download into /tmp.
+    rm -rf "$tmp"
     ok "Extracted to $RENODE_DIR"
   fi
 
