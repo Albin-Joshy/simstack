@@ -185,6 +185,19 @@ verify() {
     else
       warn "Zephyr sources — NOT FOUND"; failed=1
     fi
+
+    # Ask west what it actually sees rather than trusting that the SDK
+    # directory exists. An interrupted `west sdk install` leaves behind a
+    # complete-looking tree of zero-byte files that a presence check happily
+    # accepts but that cannot compile anything.
+    local sdk_list
+    sdk_list="$(cd "$ZEPHYR_WS/zephyr" && west sdk list 2>/dev/null || true)"
+    if grep -q 'arm-zephyr-eabi' <<<"$sdk_list"; then
+      ok "Zephyr SDK $(head -1 <<<"$sdk_list" | tr -d ':') with arm-zephyr-eabi"
+    else
+      warn "Zephyr SDK — missing or incomplete (run: west sdk install -t arm-zephyr-eabi)"
+      failed=1
+    fi
   else
     warn "Zephyr venv — NOT FOUND"; failed=1
   fi
