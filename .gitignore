@@ -1,0 +1,48 @@
+# Build outputs
+build/
+build-*/
+*.o
+*.a
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+# Zephyr / west workspace (fetched, not vendored)
+.west/
+zephyr/
+modules/
+bootloader/
+tools/
+.venv/
+__pycache__/
+*.pyc
+
+# Buildroot outputs (multi-GB, rebuilt from config)
+linux-image/buildroot/
+linux-image/output/
+linux-image/dl/
+
+# Renode / Robot Framework artifacts
+robot_output/
+*.robot.html
+log.html
+report.html
+output.xml
+renode.log
+snapshots/
+
+# KiCad transient files
+*-backups/
+*.kicad_prl
+fp-info-cache
+*.bak
+*.kicad_sch-bak
+*.kicad_pcb-bak
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
